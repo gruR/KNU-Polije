@@ -14,8 +14,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/map_key"/>
-        <activity android:name=".HomeUser"></activity>
+        <activity android:name=".user_status"></activity>
+        <activity android:name=".finish_popup" />
+        <activity android:name=".driver_waiting" />
+        <activity android:name=".driver_navigation" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_key" />
+
+        <activity android:name=".HomeUser" />
         <activity android:name=".registration" />
         <activity android:name=".login">
             <intent-filter>
