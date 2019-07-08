@@ -12,26 +12,22 @@ import android.widget.Toast;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import static android.content.ContentValues.TAG;
+
 public class MyFirebaseMessageService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Toast.makeText(this, "TEST", Toast.LENGTH_SHORT).show();
         super.onMessageReceived(remoteMessage);
-        Notification notification = new NotificationCompat.Builder(this)
-                .setContentTitle(remoteMessage.getNotification().getTitle())
-                .setContentText(remoteMessage.getNotification().getBody())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .build();
-        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
-        manager.notify(123, notification);
-        if(remoteMessage.getNotification() != null){
-            Log.d("Message","New Message");
-        }
+        Log.i("Message Received","On Message Received" +remoteMessage.getData().get("title"));
+        NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+        Intent intent = new Intent(this,MainActivity.class);
+        notificationUtils.showSmallNotification(remoteMessage.getData().get("title"),remoteMessage.getData().get("body"),intent);
+
     }
 
-    @Override
-    public void onNewToken(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
-        Log.d("Firebase Token",s);
-    }
+//    @Override
+//    public void onNewToken(String s) {
+//        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+//        Log.i("FIREBASE TOKEN","Token is"+ s);
+//    }
 }

@@ -11,6 +11,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,19 +28,30 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.knupolije.ambulance.RemoteURL.APIUrl;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int REQUEST_CODE = 101;
+    APIUrl apiUrl = new APIUrl();
+
     Button call_button;
+    String url_sendLocation = apiUrl.getApi_url()+"FCM/Response.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_user);
         call_button = findViewById(R.id.call_button);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fetchLastLocation();
+//        fetchLastLocation();
 
         call_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +75,10 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
                 if(location != null){
                     currentLocation = location;
                     Toast.makeText(HomeUser.this, currentLocation.getLatitude()+", "+currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                    String token = FirebaseInstanceId.getInstance().getToken();
+                    String latitude = String.valueOf(currentLocation.getLatitude());
+                    String longitude = String.valueOf(currentLocation.getLongitude());
+                    sendSickPeopleLocation(token,latitude,longitude);
                     SupportMapFragment supportMapFragment = (SupportMapFragment)
                             getSupportFragmentManager().findFragmentById(R.id.maps_frame);
                     supportMapFragment.getMapAsync(HomeUser.this);
@@ -70,7 +92,7 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
                 .title("Our Position");
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
         googleMap.addMarker(markerOptions);
     }
 
@@ -83,5 +105,43 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
                 }
                 break;
         }
+    }
+    public void sendSickPeopleLocation(final String token, final String latitude, final String longitude){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_sendLocation,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String success = jsonObject.getString("success");
+                            if (success.equals("1")) {
+                                Toast.makeText(HomeUser.this, "Message Received, Please Wait", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(HomeUser.this, "Error "+e.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Toast.makeText(HomeUser.this, "Error Volley "+error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        )
+        {
+            @Override
+            protected Map<String,String> getParams() throws AuthFailureError{
+                Map<String,String> params = new HashMap<>();
+                params.put("token",token);
+                params.put("latitude",latitude);
+                params.put("longitude",longitude);
+                return params;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 }
