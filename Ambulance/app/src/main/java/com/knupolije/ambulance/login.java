@@ -122,6 +122,7 @@ public class login extends AppCompatActivity {
                 Map<String,String> params = new HashMap<>();
                 params.put("email",id);
                 params.put("password",password);
+                params.put("fb_token",FirebaseInstanceId.getInstance().getToken());
                 return params;
             }
         };

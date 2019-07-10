@@ -115,7 +115,8 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
                             JSONObject jsonObject = new JSONObject(response);
                             String success = jsonObject.getString("success");
                             if (success.equals("1")) {
-                                Toast.makeText(HomeUser.this, "Message Received, Please Wait", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(HomeUser.this, , Toast.LENGTH_SHORT).show();
+                                Toast.makeText(HomeUser.this, "Message Received, Please Wait"+token, Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -135,7 +136,7 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             protected Map<String,String> getParams() throws AuthFailureError{
                 Map<String,String> params = new HashMap<>();
-                params.put("token",token);
+                params.put("token",FirebaseInstanceId.getInstance().getToken());
                 params.put("latitude",latitude);
                 params.put("longitude",longitude);
                 return params;
