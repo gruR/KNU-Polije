@@ -56,6 +56,7 @@ public class HomeUser extends AppCompatActivity implements OnMapReadyCallback {
         call_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                sendSickPeopleLocation("ASAS","1221","12122");
                 fetchLastLocation();
             }
         });

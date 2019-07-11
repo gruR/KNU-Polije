@@ -43,7 +43,8 @@ public class login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_login);
-        Toast.makeText(this, "AAA", Toast.LENGTH_SHORT).show();
+//        String token = FirebaseInstanceId.getInstance().getToken();
+//        System.out.println("Token Refreshed ; "+token);
         login_btn = findViewById(R.id.login_btn);
         signup_btn = findViewById(R.id.signup_btn);
         editId = findViewById(R.id.editId);
